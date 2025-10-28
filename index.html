@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>formulário</title>
+</head>
+<body>
+    <h1>Simulador MQTT</h1>
+    <div id="formulario">
+        <input id= "mensagem"  type="text" placeholder="Digite a mensagem"/>
+        <button onclick="enviarMensagem()">Enviar</button>
+    </div>
+
+    <h2>Mensagens recebidas</h2>
+    <ul id="listaMensagens"></ul>
+
+    <script>
+        async function enviarMensagem(){
+                const input= document.getElementById("mensagem");
+                const texto= input.value.trim()
+                if(!texto){
+                    alert("Digite uma mensagem!")
+                    return;
+                }
+
+                const res= await fetch("/enviar", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JOIN.stringify({mensagem: texto})
+                });
+                if(res.ok){
+                    input.value="";
+                    atualizarMensagens();
+                } else{
+                    alert("Erro ao enviar mensagem.");
+                }
+        }
+
+        async function atualizarMensagens(){
+            const res= await fetch("/mensagens")
+            const mensagens= await res.json();
+            const lista= document.getElementById("listaMensagens");
+
+            lista.innerHTML= "",
+            mensagens.forEach( msg => {
+                const li= document.createElement("li");
+                li.textContent= msg;
+                lista.appendChild(li)
+            });
+        }
+    </script>
+    
+</body>
+</html>
